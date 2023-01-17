@@ -1,19 +1,18 @@
 <script setup lang="ts">
 import { ref, nextTick } from "vue"
-import * as Cesium from "cesium"
 import { onMounted } from "vue"
-import { useMapStore } from "@/store/mapStore"
-// 仓库
-const mapStore = useMapStore()
-// 地图实例
-const myMap = ref()
+import useMapStore from "@/store/mapStore"
+
 onMounted(() => {
-    myMap.value = new Cesium.Viewer("map", {
-        infoBox: false, // 禁用沙箱，解决控制台报错
-    })
+    // 仓库
+    const mapStore = useMapStore()
+    // 初始化地图
+    mapStore.createViewer()
     nextTick(() => {
-        // 保存地图实例到全局状态管理器
-        mapStore.setMapObj(myMap.value)
+        mapStore.setMapLocatingSignals([116.39, 39.91, 100000], "flyTo")
+        mapStore.createPoint([116.39, 39.91, 0])
+        mapStore.createLine([116.39, 39.91, 116.4, 39.91])
+        mapStore.createPlane([116.39, 39.91, 116.4, 39.91, 116.4, 39.99])
     })
 })
 </script>
