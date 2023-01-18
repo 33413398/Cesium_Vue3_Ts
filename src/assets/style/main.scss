@@ -7,3 +7,7 @@ body,html,#app {
   font-size: 14px;
   color: #fff;
 }
+// 去除地图logo
+.cesium-widget-credits{
+  display:none!important;
+}

@@ -8,7 +8,9 @@ export default defineStore('mapStore', {
   state: () => {
     return {
       // 所有这些属性都将自动推断其类型
-      viewer: null as Cesium.Viewer | null
+      viewer: null as Cesium.Viewer | null,
+      velocityVectorProperty: null as any,
+      velocityVector: null as any,
     }
   },
   actions: {
@@ -19,6 +21,7 @@ export default defineStore('mapStore', {
       // 天地图Key
       const tdtKey = '003d28b20e1054d1e0bbf1039a2c5596'
       this.viewer = new Cesium.Viewer("map", {
+        animation: false, // 是否开启动画
         infoBox: false, // 禁用沙箱，不显示图形信息，解决控制台报错
         baseLayerPicker: false, // 隐藏默认地图
         fullscreenButton: false, // 全屏按钮是否显示
@@ -31,7 +34,7 @@ export default defineStore('mapStore', {
         navigationHelpButton: false, // 是否显示导航帮助按钮
         timeline: false, // 是否显示时间线
         selectionIndicator: false, // 是否显示选取指示器组件
-        shouldAnimate: false, // 自动播放动画控件
+        shouldAnimate: true, // 自动播放动画控件
         shadows: false, // 是否显示光照投影的阴影
         // 地图投影底图
         // terrainProvider: new Cesium.CesiumTerrainProvider({ 
@@ -46,7 +49,6 @@ export default defineStore('mapStore', {
           maximumLevel: 18,
         }),
       })
-
       // 解决文字标注不清晰问题
       this.viewer.scene.postProcessStages.fxaa.enabled = true
       // 隐藏太阳和月亮
@@ -111,29 +113,34 @@ export default defineStore('mapStore', {
       )
     },
     // 定位到指定区域
-    setMapLocatingSignals(coordinate: number[], type: string = 'flyTo') {
+    setMapLocatingSignals(coordinate: number[], type: string = 'flyTo', more: boolean = false) {
       if (!this.viewer) {
         console.error('请先初始化地图！');
         return
       }
+
+      let position: any = Cesium.Cartesian3.fromDegrees(coordinate[0], coordinate[1], coordinate[2]);
+      if (more) {
+        position = Cesium.Cartesian3.fromDegreesArray(coordinate);
+      }
       if (type === 'flyTo') {
         // 带动画
         this.viewer.camera.flyTo({
-          destination: Cesium.Cartesian3.fromDegrees(coordinate[0], coordinate[1], coordinate[2]),
+          destination: position,
           orientation: {
             heading: Cesium.Math.toRadians(0),
-            pitch: Cesium.Math.toRadians(-90),
+            pitch: Cesium.Math.toRadians(-45),
             roll: 0
           },
-          duration: 1 // 动画持续 秒
+          duration: 2 // 动画持续 秒
         })
       } else {
         // 无动画，直接跳转
         this.viewer.camera.setView({
-          destination: Cesium.Cartesian3.fromDegrees(coordinate[0], coordinate[1], coordinate[2]),
+          destination: position,
           orientation: {
             heading: Cesium.Math.toRadians(0),
-            pitch: Cesium.Math.toRadians(-90),
+            pitch: Cesium.Math.toRadians(-45),
             roll: 0
           }
         })
@@ -141,7 +148,12 @@ export default defineStore('mapStore', {
     },
     // 打点
     createPoint(coordinate: number[]) {
-      const position = new Cesium.Cartesian3.fromDegrees(coordinate[0], coordinate[1], coordinate[2]);
+      if (!this.viewer) {
+        console.error('请先初始化地图！');
+        return
+      }
+      this.clearMap()
+      const position = Cesium.Cartesian3.fromDegrees(coordinate[0], coordinate[1], coordinate[2]);
       const entity = this.viewer.entities.add({
         position: position,
         point: {
@@ -149,32 +161,179 @@ export default defineStore('mapStore', {
           color: new Cesium.Color(1, 0, 0, 1)
         }
       });
+
     },
     // 绘制线
     createLine(coordinate: number[]) {
+      if (!this.viewer) {
+        console.error('请先初始化地图！');
+        return
+      }
+      this.clearMap()
       const entity = this.viewer.entities.add({
         polyline: {
           show: true,
-          positions: new Cesium.Cartesian3.fromDegreesArray(coordinate),
+          positions: Cesium.Cartesian3.fromDegreesArray(coordinate),
           width: 5,
           material: new Cesium.Color(0, 0, 1, 1)
         }
       });
+
     },
     // 绘制面
     createPlane(coordinate: number[]) {
-      // const position = new Cesium.Cartesian3.fromDegreesArray(coordinate);
-      // const entity3 = this.viewer.entities.add({
-      //   position: position,
-      //   plane: {
-      //     plane: new Cesium.Plane(Cesium.Cartesian3.UNIT_Z, 0.0), // 面得朝向--笛卡尔坐标
-      //     dimensions: new Cesium.Cartesian2(400, 300), // 宽高
-      //     material: Cesium.Color.RED.withAlpha(0.5), // 面颜色
-      //     outline: true, // 显示边框
-      //     outlineColor: Cesium.Color.BLACK // 线颜色
-      //   }
-      // });
+      if (!this.viewer) {
+        console.error('请先初始化地图！');
+        return
+      }
+      this.clearMap()
+      const position = Cesium.Cartesian3.fromDegrees(coordinate[0], coordinate[1], coordinate[2]);
+      const entity = this.viewer.entities.add({
+        position: position,
+        plane: {
+          plane: new Cesium.Plane(Cesium.Cartesian3.UNIT_Z, 0.0), // 面得朝向--笛卡尔坐标
+          dimensions: new Cesium.Cartesian2(400, 300), // 宽高
+          material: Cesium.Color.RED.withAlpha(0.5), // 面颜色
+          outline: true, // 显示边框
+          outlineColor: Cesium.Color.BLACK // 线颜色
+        }
+      });
+
     },
+    // 绘制文本
+    createText(coordinate: number[]) {
+      if (!this.viewer) {
+        console.error('请先初始化地图！');
+        return
+      }
+      this.clearMap()
+      const position = Cesium.Cartesian3.fromDegrees(coordinate[0], coordinate[1], coordinate[2]);
+      const entity = this.viewer.entities.add({
+        position: position,
+        label: {
+          text: "我是文本",
+          font: "50px Helvetica",
+          fillColor: Cesium.Color.SKYBLUE
+        }
+      });
+
+    },
+    // 绘制多边形
+    createPolygon(coordinate: number[]) {
+      if (!this.viewer) {
+        console.error('请先初始化地图！');
+        return
+      }
+      this.clearMap()
+      const entity = this.viewer.entities.add({
+        polygon: {
+          hierarchy: Cesium.Cartesian3.fromDegreesArray(coordinate),
+          material: Cesium.Color.RED,
+          extrudedHeight: 200, // 垂直方向拉伸实现立体效果
+        }
+      });
+
+    },
+    // 绘制模型
+    createModel(coordinate: number[], url: string, height: number) {
+      if (!this.viewer) {
+        console.error('请先初始化地图！');
+        return
+      }
+      this.clearMap()
+      this.viewer.entities.removeAll();
+
+      const position = Cesium.Cartesian3.fromDegrees(
+        coordinate[0], coordinate[1],
+        height
+      );
+      const heading = Cesium.Math.toRadians(135);
+      const pitch = 0;
+      const roll = 0;
+      const hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
+      const orientation = Cesium.Transforms.headingPitchRollQuaternion(
+        position,
+        hpr
+      );
+
+      const entity = this.viewer.entities.add({
+        name: url,
+        position: position,
+        orientation: orientation,
+        model: {
+          uri: url,
+          minimumPixelSize: 128,
+          maximumScale: 20000,
+        },
+      });
+      this.viewer.trackedEntity = entity;
+    },
+    // 绘制移动模型
+    createMoveModel(coordinate: number[]) {
+      if (!this.viewer) {
+        console.error('请先初始化地图！');
+        return
+      }
+      this.clearMap()
+      const _this: any = this
+      const scene = this.viewer.scene;
+      const position = Cesium.Cartesian3.fromDegrees(
+        coordinate[0],
+        coordinate[1]
+      );
+      const url = "/models/CesiumMan/Cesium_Man.glb";
+      const entity = (this.viewer.trackedEntity = this.viewer.entities.add({
+        name: url,
+        position: position,
+        model: {
+          uri: url,
+          minimumPixelSize: 128,
+          maximumScale: 20000,
+        },
+      }));
+
+      // Shade selected model with highlight.
+      const fragmentShaderSource = `
+        uniform sampler2D colorTexture;
+        varying vec2 v_textureCoordinates;
+        uniform vec4 highlight;
+        void main() {
+            vec4 color = texture2D(colorTexture, v_textureCoordinates);
+            if (czm_selected()) {
+                vec3 highlighted = highlight.a * highlight.rgb + (1.0 - highlight.a) * color.rgb;
+                gl_FragColor = vec4(highlighted, 1.0);
+            } else { 
+                gl_FragColor = color;
+            }
+        }
+        `;
+
+      const stage = scene.postProcessStages.add(
+        new Cesium.PostProcessStage({
+          fragmentShader: fragmentShaderSource,
+          uniforms: {
+            highlight: function () {
+              return new Cesium.Color(1.0, 0.0, 0.0, 0.5);
+            },
+          },
+        })
+      );
+      stage.selected = [];
+
+      const handler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
+      handler.setInputAction(function (movement: any) {
+        const pickedObject = _this.viewer.scene.pick(movement.endPosition);
+        if (Cesium.defined(pickedObject)) {
+          stage.selected = [pickedObject.primitive];
+        } else {
+          stage.selected = [];
+        }
+      }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+    },
+    // 清除图层
+    clearMap() {
+      this.viewer && this.viewer.entities.removeAll()
+    }
   },
   getters: {
     getViewer: (state) => state.viewer,
