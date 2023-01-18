@@ -111,6 +111,14 @@ export default defineStore('mapStore', {
           url: Cesium.IonResource.fromAssetId(96188)
         })
       )
+      // 添加鼠标事件
+      const handler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas)
+      handler.setInputAction(function (movement) {
+        const pick = _this.viewer.scene.pick(movement.position);
+        if (Cesium.defined(pick)) { // 若多个元素可加判断id  pick.id.id === 'id'
+          alert('点击了')
+        }
+      }, Cesium.ScreenSpaceEventType.LEFT_CLICK)
     },
     // 定位到指定区域
     setMapLocatingSignals(coordinate: number[], type: string = 'flyTo', more: boolean = false) {
@@ -159,7 +167,8 @@ export default defineStore('mapStore', {
         point: {
           pixelSize: 15,
           color: new Cesium.Color(1, 0, 0, 1)
-        }
+        },
+        description: '<div>我是点弹窗</div>'
       });
 
     },
@@ -176,7 +185,8 @@ export default defineStore('mapStore', {
           positions: Cesium.Cartesian3.fromDegreesArray(coordinate),
           width: 5,
           material: new Cesium.Color(0, 0, 1, 1)
-        }
+        },
+        description: '<div>我是线弹窗</div>'
       });
 
     },
@@ -196,7 +206,8 @@ export default defineStore('mapStore', {
           material: Cesium.Color.RED.withAlpha(0.5), // 面颜色
           outline: true, // 显示边框
           outlineColor: Cesium.Color.BLACK // 线颜色
-        }
+        },
+        description: '<div>我是面弹窗</div>'
       });
 
     },
@@ -230,7 +241,8 @@ export default defineStore('mapStore', {
           hierarchy: Cesium.Cartesian3.fromDegreesArray(coordinate),
           material: Cesium.Color.RED,
           extrudedHeight: 200, // 垂直方向拉伸实现立体效果
-        }
+        },
+        description: '<div>我是多边形弹窗</div>'
       });
 
     },
@@ -265,6 +277,7 @@ export default defineStore('mapStore', {
           minimumPixelSize: 128,
           maximumScale: 20000,
         },
+        description: '<div>我是模型弹窗</div>'
       });
       this.viewer.trackedEntity = entity;
     },
@@ -290,6 +303,7 @@ export default defineStore('mapStore', {
           minimumPixelSize: 128,
           maximumScale: 20000,
         },
+        description: '<div>我是移动模型弹窗</div>'
       }));
 
       // Shade selected model with highlight.
