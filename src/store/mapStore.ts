@@ -113,10 +113,10 @@ export default defineStore('mapStore', {
       )
       // 添加鼠标事件
       const handler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas)
-      handler.setInputAction(function (movement) {
+      handler.setInputAction(function (movement:any) {
         const pick = _this.viewer.scene.pick(movement.position);
         if (Cesium.defined(pick)) { // 若多个元素可加判断id  pick.id.id === 'id'
-          alert('点击了')
+            alert('点击了图元ID为：'+pick.id._id+'的元素！')
         }
       }, Cesium.ScreenSpaceEventType.LEFT_CLICK)
     },
@@ -164,6 +164,7 @@ export default defineStore('mapStore', {
       const position = Cesium.Cartesian3.fromDegrees(coordinate[0], coordinate[1], coordinate[2]);
       const entity = this.viewer.entities.add({
         position: position,
+        id:'point',
         point: {
           pixelSize: 15,
           color: new Cesium.Color(1, 0, 0, 1)
@@ -180,6 +181,7 @@ export default defineStore('mapStore', {
       }
       this.clearMap()
       const entity = this.viewer.entities.add({
+        id:'line',
         polyline: {
           show: true,
           positions: Cesium.Cartesian3.fromDegreesArray(coordinate),
@@ -200,6 +202,7 @@ export default defineStore('mapStore', {
       const position = Cesium.Cartesian3.fromDegrees(coordinate[0], coordinate[1], coordinate[2]);
       const entity = this.viewer.entities.add({
         position: position,
+        id:'plane',
         plane: {
           plane: new Cesium.Plane(Cesium.Cartesian3.UNIT_Z, 0.0), // 面得朝向--笛卡尔坐标
           dimensions: new Cesium.Cartesian2(400, 300), // 宽高
@@ -221,6 +224,7 @@ export default defineStore('mapStore', {
       const position = Cesium.Cartesian3.fromDegrees(coordinate[0], coordinate[1], coordinate[2]);
       const entity = this.viewer.entities.add({
         position: position,
+        id:'label',
         label: {
           text: "我是文本",
           font: "50px Helvetica",
@@ -237,6 +241,7 @@ export default defineStore('mapStore', {
       }
       this.clearMap()
       const entity = this.viewer.entities.add({
+        id:'polygon',
         polygon: {
           hierarchy: Cesium.Cartesian3.fromDegreesArray(coordinate),
           material: Cesium.Color.RED,
@@ -272,6 +277,7 @@ export default defineStore('mapStore', {
         name: url,
         position: position,
         orientation: orientation,
+        id:'model',
         model: {
           uri: url,
           minimumPixelSize: 128,
@@ -297,6 +303,7 @@ export default defineStore('mapStore', {
       const url = "/models/CesiumMan/Cesium_Man.glb";
       const entity = (this.viewer.trackedEntity = this.viewer.entities.add({
         name: url,
+        id:'moveModel',
         position: position,
         model: {
           uri: url,
