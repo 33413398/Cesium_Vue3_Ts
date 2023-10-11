@@ -1,0 +1,23 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+#app {
+  height: 100%;
+  width: 100%;
+  font-size: $bodyFontSize;
+}
+
+.map {
+  height: 100%;
+  width: 100%;
+}
+
+// 去除地图logo
+.cesium-widget-credits{
+  display:none!important;
+}
