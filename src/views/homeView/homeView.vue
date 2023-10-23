@@ -1,5 +1,5 @@
 <script setup lang="ts" name="homeView">
-import myMap from '@/components/myMap.vue';
+import MyMap from '@/components/MyMap.vue';
 import { Viewer } from 'cesium'
 import { ref } from 'vue'
 
@@ -22,16 +22,12 @@ const menuItemList = ref([
     children: [
       {
         id: 'point',
-        title: '点',
+        title: '普通撒点',
       },
       {
-        id: 'line',
-        title: '线',
-      },
-      {
-        id: 'area',
-        title: '面',
-      },
+        id: 'clusterPoint',
+        title: '聚合撒点',
+      }
     ]
   }
 ])
@@ -80,7 +76,7 @@ const mapConfig: Viewer.ConstructorOptions = {
         </el-scrollbar>
       </el-menu>
     </div>
-    <myMap :mapConfig="mapConfig"></myMap>
+    <MyMap :mapConfig="mapConfig"></MyMap>
   </div>
 </template>
 <style lang="scss" scoped>

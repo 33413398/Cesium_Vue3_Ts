@@ -13,3 +13,18 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
+
+// 全局类型
+declare module '*.vue' {
+  declare global {
+    interface Window {
+      GViewer: any
+      CESIUM_BASE_URL: string
+    }
+  }
+  import type { DefineComponent } from 'vue'
+  const component: DefineComponent<{}, {}, any>
+  export default component
+}
+
+declare module 'nprogress'

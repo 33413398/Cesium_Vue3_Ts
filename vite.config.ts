@@ -94,6 +94,23 @@ export default defineConfig(({ command, mode }) => {
     })
   )
 
+  // 服务代理
+  const server = {
+    proxy: {
+      '/api': {
+        target: 'http://map.217dan.com/addons/cesiummapv', // 跨域目标主机，自行修改
+        pathRewrite: { '^/api': '' },
+        changeOrigin: true,
+        rewrite: (p: any) => p.replace(/^\/api/, '')
+      },
+      '/map_asset': {
+        target: 'http://myhome.217dan.com:8081',
+        pathRewrite: { '^/map_asset': '' },
+        changeOrigin: true,
+        rewrite: (p: any) => p.replace(/^\/map_asset/, '')
+      }
+    }
+  }
   return {
     base,
     envDir,
@@ -103,6 +120,7 @@ export default defineConfig(({ command, mode }) => {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url))
       }
-    }
+    },
+    server
   }
 })

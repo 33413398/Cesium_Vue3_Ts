@@ -7,7 +7,9 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    ButtonTools: typeof import('./src/components/ButtonTools.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
+    ElButton: typeof import('element-plus/es')['ElButton']
     ElContainer: typeof import('element-plus/es')['ElContainer']
     ElHeader: typeof import('element-plus/es')['ElHeader']
     ElIcon: typeof import('element-plus/es')['ElIcon']
@@ -19,8 +21,9 @@ declare module 'vue' {
     ElRadioGroup: typeof import('element-plus/es')['ElRadioGroup']
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
     ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
-    MyMap: typeof import('./src/components/myMap.vue')['default']
+    MyMap: typeof import('./src/components/MyMap.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    ShowLngLat: typeof import('./src/components/ShowLngLat.vue')['default']
   }
 }

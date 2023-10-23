@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { Viewer, Cartesian3, Math } from 'cesium'
+import { getGeojson } from '@/api/base'
 
 export const useMapStore = defineStore('map', () => {
   // 要避免 Vue 的响应式劫持，响应式问题可以通过 Vue3 的 shallowRef 或 shallowReactive 来解决
@@ -12,15 +13,19 @@ export const useMapStore = defineStore('map', () => {
   }
 
   // 定位到指定区域
-  function setMapLocatingSignals(coordinate: number[], type: string = 'flyTo', more: boolean = false) {
+  function setMapLocatingSignals(
+    coordinate: number[],
+    type: string = 'flyTo',
+    more: boolean = false
+  ) {
     if (!viewer) {
-      console.error('请先初始化地图！');
+      console.error('请先初始化地图！')
       return
     }
 
-    let position: any = Cartesian3.fromDegrees(coordinate[0], coordinate[1], coordinate[2]);
+    let position: any = Cartesian3.fromDegrees(coordinate[0], coordinate[1], coordinate[2])
     if (more) {
-      position = Cartesian3.fromDegreesArray(coordinate);
+      position = Cartesian3.fromDegreesArray(coordinate)
     }
     if (type === 'flyTo') {
       // 带动画
@@ -28,7 +33,7 @@ export const useMapStore = defineStore('map', () => {
         destination: position,
         orientation: {
           heading: Math.toRadians(0),
-          pitch: Math.toRadians(-45),
+          pitch: Math.toRadians(-90),
           roll: 0
         },
         duration: 2 // 动画持续 秒
@@ -39,12 +44,20 @@ export const useMapStore = defineStore('map', () => {
         destination: position,
         orientation: {
           heading: Math.toRadians(0),
-          pitch: Math.toRadians(-45),
+          pitch: Math.toRadians(-90),
           roll: 0
         }
       })
     }
   }
+  // 撒点方法
+  function createPoint(type: string) {
+    if (type === 'clusterPoint') {
+      // 聚合
+    } else {
+      // 普通撒点
+    }
+  }
 
-  return { viewer, getViewer, setViewer, setMapLocatingSignals }
+  return { viewer, getViewer, setViewer, setMapLocatingSignals, createPoint }
 })

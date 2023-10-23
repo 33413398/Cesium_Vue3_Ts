@@ -1,0 +1,85 @@
+<template>
+  <div class="ShowLngLatContainer">
+    <span>lng:{{ lng }}</span> <span>lat:{{ lat }}</span> <span>height:{{ height }}</span>
+  </div>
+</template>
+<script lang="ts" setup name="ShowLngLat">
+import { ref, } from 'vue'
+import * as Cesium from "cesium"
+
+const lng = ref<string>()
+const lat = ref<string>()
+let height = ref<string>()
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const initCesiumHandler = (Viewer: any) => {
+  const canvas = Viewer.scene.canvas
+  const ellipsoid = Viewer.scene.globe.ellipsoid
+  const handler = new Cesium.ScreenSpaceEventHandler(canvas)
+  handler.setInputAction(function (movement: any) {
+    const cartesian = Viewer.camera.pickEllipsoid(
+      movement.endPosition,
+      ellipsoid
+    )
+    if (cartesian) {
+      const cartographic = Viewer.scene.globe.ellipsoid.cartesianToCartographic(
+        cartesian
+      )
+      lat.value = Cesium.Math.toDegrees(cartographic.latitude).toFixed(4)
+      lng.value = Cesium.Math.toDegrees(cartographic.longitude).toFixed(4)
+      height.value = (
+        Viewer.camera.positionCartographic.height / 1000
+      ).toFixed(2) + '千米'
+    }
+  }, Cesium.ScreenSpaceEventType.MOUSE_MOVE)
+  handler.setInputAction(function (movement: any) {
+    console.log(movement);
+    
+    const cartesian = Viewer.camera.pickEllipsoid(
+      movement.endPosition,
+      ellipsoid
+    )
+    console.log(cartesian);
+    
+    if (cartesian) {
+      const cartographic = Viewer.scene.globe.ellipsoid.cartesianToCartographic(
+        cartesian
+      )
+      const lat = Cesium.Math.toDegrees(cartographic.latitude).toFixed(4)
+      const lng = Cesium.Math.toDegrees(cartographic.longitude).toFixed(4)
+      const height = (
+        // Viewer.camera.positionCartographic.height / 1000
+        Viewer.camera.positionCartographic.height
+      )
+      console.log(`经度：${lng}纬度：${lat}高度：${height}`);
+    }
+  }, Cesium.ScreenSpaceEventType.LEFT_CLICK)
+}
+defineExpose({
+  initCesiumHandler
+})
+</script>
+<style lang="scss">
+.distance-legend {
+  right: 0.28rem;
+}
+</style>
+<style lang="scss" scoped>
+.ShowLngLatContainer {
+  position: absolute;
+  bottom: 0px;
+  padding: 0.04rem 0.06rem 0.04rem 0.06rem;
+  color: white;
+  font-size: 0.14rem;
+  right: 0;
+  background-color: #00000055;
+  width: 1.75rem;
+
+  span {
+    margin-right: 0.06rem;
+  }
+
+  span:last-child {
+    margin-right: 0.06rem;
+  }
+}
+</style>

@@ -16,10 +16,3 @@ app.use(router)
 app.use(ElementPlus, { size: 'small', zIndex: 3000 })
 
 app.mount('#app')
-
-// 全局类型
-declare global {
-  interface Window {
-    CESIUM_BASE_URL: string
-  }
-}
