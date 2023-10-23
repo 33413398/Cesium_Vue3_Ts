@@ -89,18 +89,18 @@ onMounted(() => {
   viewer.scene.highDynamicRange = false
   modifyMapStyle(viewer, {
     //反色?
-    invertColor: true,
+    invertColor: false,
     //滤镜值
-    filterRGB: [60, 145, 172]
+    filterRGB: [47,156,251],
   })
   const imageryLayer: any = viewer.imageryLayers.get(0)
-  // viewer.scene.globe.baseColor = new Cesium.Color(0, 40 / 255, 102 / 255)
+  viewer.scene.globe.baseColor = new Cesium.Color(0, 40 / 255, 102 / 255)
   imageryLayer.alpha = 0.75 // 图层透明度值，取值范围为0.0~1.0。
-  // imageryLayer.brightness = 1 // 图层亮度值。值为1.0表示使用原图；值大于1.0时图像将变亮；值小于1.0时图像将变暗。
-  // imageryLayer.contrast = -1.2 // 图层对比度。值为1.0表示使用原图；值大于1.0表示增加对比度；值小于1.0表示降低对比度。
+  imageryLayer.brightness = 1 // 图层亮度值。值为1.0表示使用原图；值大于1.0时图像将变亮；值小于1.0时图像将变暗。
+  imageryLayer.contrast = -1.2 // 图层对比度。值为1.0表示使用原图；值大于1.0表示增加对比度；值小于1.0表示降低对比度。
   imageryLayer.hue = 3 // 图层色调。值为0.0表示使用原图。
   // imageryLayer.saturation = 1 // 图层饱和度。值为1.0表示使用原图；值大于1.0表示增加饱和度；值小于1.0表示降低饱和度。
-  // imageryLayer.gamma = 0.6 // 图层伽马校正。值为1.0表示使用原图。
+  // imageryLayer.gamma = 1 // 图层伽马校正。值为1.0表示使用原图。
 
   // 更换右键和中键
   viewer.scene.screenSpaceCameraController.tiltEventTypes = [

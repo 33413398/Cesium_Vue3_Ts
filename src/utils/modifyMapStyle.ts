@@ -2,7 +2,7 @@
 export default function modifyMap(viewer:any, options:any) {
   const baseLayer = viewer.imageryLayers.get(0)
   //以下几个参数根据实际情况修改,目前我是参照火星科技的参数,个人感觉效果还不错
-  baseLayer.brightness = options.brightness || 0.6
+  baseLayer.brightness = options.brightness || 0.5
   baseLayer.contrast = options.contrast || 1.8
   baseLayer.gamma = options.gamma || 0.3
   // baseLayer.hue = options.hue || 1
