@@ -16,11 +16,17 @@ const handleClose = (key: string, keyPath: string[]) => {
 }
 
 const menuItemClick = (e: any) => {
-  console.log(e.index);
+  mapStore.clearMapAll(e.index === 'clearAll')
   if (e.index === 'point' || e.index === 'clusterPoint') {
     mapStore.createPoint(e.index)
+  } else if (e.index === 'heatMap') {
+    mapStore.cerateCesiumHeatMap()
+  } else if (e.index === 'colorLayer') {
+    mapStore.cerateColorLayer()
+  } else if (e.index === 'maskReverseSelect') {
+    mapStore.cerateMaskReverseSelect()
   } else {
-    mapStore.clearMapAll()
+    console.log('当前选中项未匹配到:' + e.index);
   }
 
 }
@@ -37,6 +43,18 @@ const menuItemList = ref([
       {
         id: 'clusterPoint',
         title: '聚合撒点',
+      },
+      {
+        id: 'heatMap',
+        title: '热力图',
+      },
+      {
+        id: 'colorLayer',
+        title: '四色图',
+      },
+      {
+        id: 'maskReverseSelect',
+        title: '遮罩反选',
       },
       {
         id: 'clearAll',
