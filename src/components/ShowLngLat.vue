@@ -31,28 +31,6 @@ const initCesiumHandler = (Viewer: any) => {
       ).toFixed(2) + '千米'
     }
   }, Cesium.ScreenSpaceEventType.MOUSE_MOVE)
-  handler.setInputAction(function (movement: any) {
-    console.log(movement);
-    
-    const cartesian = Viewer.camera.pickEllipsoid(
-      movement.endPosition,
-      ellipsoid
-    )
-    console.log(cartesian);
-    
-    if (cartesian) {
-      const cartographic = Viewer.scene.globe.ellipsoid.cartesianToCartographic(
-        cartesian
-      )
-      const lat = Cesium.Math.toDegrees(cartographic.latitude).toFixed(4)
-      const lng = Cesium.Math.toDegrees(cartographic.longitude).toFixed(4)
-      const height = (
-        // Viewer.camera.positionCartographic.height / 1000
-        Viewer.camera.positionCartographic.height
-      )
-      console.log(`经度：${lng}纬度：${lat}高度：${height}`);
-    }
-  }, Cesium.ScreenSpaceEventType.LEFT_CLICK)
 }
 defineExpose({
   initCesiumHandler

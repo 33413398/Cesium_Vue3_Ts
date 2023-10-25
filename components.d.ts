@@ -22,6 +22,7 @@ declare module 'vue' {
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
     ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
     MyMap: typeof import('./src/components/MyMap.vue')['default']
+    Popup: typeof import('./src/components/Popup.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     ShowLngLat: typeof import('./src/components/ShowLngLat.vue')['default']

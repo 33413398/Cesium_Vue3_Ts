@@ -102,12 +102,6 @@ export default defineConfig(({ command, mode }) => {
         pathRewrite: { '^/api': '' },
         changeOrigin: true,
         rewrite: (p: any) => p.replace(/^\/api/, '')
-      },
-      '/map_asset': {
-        target: 'http://myhome.217dan.com:8081',
-        pathRewrite: { '^/map_asset': '' },
-        changeOrigin: true,
-        rewrite: (p: any) => p.replace(/^\/map_asset/, '')
       }
     }
   }

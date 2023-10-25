@@ -132,7 +132,7 @@ onMounted(() => {
   // 挂载到全局变量
   window.GViewer = viewer
   // 定位
-  mapStore.setMapLocatingSignals([113.9332, 22.5212, 28860], 'flyTo')
+  mapStore.setMapLocatingSignals([113.9332, 22.5212, 28860], 'noFlyTo')
 })
 onBeforeUnmount(() => {
   if (viewer) {

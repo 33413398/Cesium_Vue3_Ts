@@ -2,6 +2,10 @@
 import MyMap from '@/components/MyMap.vue';
 import { Viewer } from 'cesium'
 import { ref } from 'vue'
+import { useMapStore } from '@/stores/map'
+
+// 实例化store
+const mapStore = useMapStore()
 
 const isCollapse = ref(false)
 const handleOpen = (key: string, keyPath: string[]) => {
@@ -13,6 +17,12 @@ const handleClose = (key: string, keyPath: string[]) => {
 
 const menuItemClick = (e: any) => {
   console.log(e.index);
+  if (e.index === 'point' || e.index === 'clusterPoint') {
+    mapStore.createPoint(e.index)
+  } else {
+    mapStore.clearMapAll()
+  }
+
 }
 
 const menuItemList = ref([
@@ -27,9 +37,13 @@ const menuItemList = ref([
       {
         id: 'clusterPoint',
         title: '聚合撒点',
+      },
+      {
+        id: 'clearAll',
+        title: '清空地图',
       }
     ]
-  }
+  },
 ])
 
 const defaultOpeneds = ref([1])
