@@ -25,6 +25,10 @@ const menuItemClick = (e: any) => {
     mapStore.cerateColorLayer()
   } else if (e.index === 'maskReverseSelect') {
     mapStore.cerateMaskReverseSelect()
+  } else if (e.index === 'roadEntity') {
+    mapStore.cerateRoadEntity()
+  } else if (e.index === 'roadPrimitive') {
+    mapStore.cerateRoadPrimitive()
   } else {
     console.log('当前选中项未匹配到:' + e.index);
   }
@@ -57,9 +61,17 @@ const menuItemList = ref([
         title: '遮罩反选',
       },
       {
+        id: 'roadEntity',
+        title: '路网穿梭(entity渲染)',
+      },
+      {
+        id: 'roadPrimitive',
+        title: '路网穿梭(primitive渲染)',
+      },
+      {
         id: 'clearAll',
         title: '清空地图',
-      }
+      },
     ]
   },
 ])

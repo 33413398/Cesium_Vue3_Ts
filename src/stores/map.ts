@@ -6,13 +6,14 @@ import { getGeojson } from '@/api/base'
 import { initCluster } from '@/utils/mapCluster'
 import Dialog from '@/utils/dialog'
 import CesiumHeatMap from '@/utils/cesiumHeatMap'
+import RoadThroughLine from '@/utils/roadThrough'
 
 export const useMapStore = defineStore('map', () => {
   // 要避免 Vue 的响应式劫持，响应式问题可以通过 Vue3 的 shallowRef 或 shallowReactive 来解决
   let viewer: Viewer | null = null
   let cesiumHeatMapObj: any = null
-  // 点位图层
-  let BillboardCollection: any = null
+  // primitives 相关图层
+  let primitivesArray: any = []
   const dialogs = ref()
   const getViewer = computed(() => viewer)
   function setViewer(myViewer: Viewer | null) {
@@ -61,7 +62,7 @@ export const useMapStore = defineStore('map', () => {
     if (viewer) {
       let pointFeatures: any = []
       const billboardsCollection = viewer.scene.primitives.add(new Cesium.BillboardCollection())
-      BillboardCollection = billboardsCollection
+      primitivesArray.push(billboardsCollection)
       if (type === 'clusterPoint') {
         // 聚合
         initCluster(viewer, '/json/schools.geojson')
@@ -154,6 +155,7 @@ export const useMapStore = defineStore('map', () => {
     const features = res.features
     if (viewer) {
       const labelCollection = viewer.scene.primitives.add(new Cesium.LabelCollection())
+      primitivesArray.push(labelCollection)
       const colorArrs: any = [
         'AQUAMARINE',
         'BEIGE',
@@ -190,6 +192,7 @@ export const useMapStore = defineStore('map', () => {
               geometry: geometry,
               attributes: {
                 color: Cesium.ColorGeometryInstanceAttribute.fromColor(
+                  // @ts-ignore
                   Cesium.Color.fromAlpha(Cesium.Color[colorArrs[i]], 0.6)
                 ),
                 show: new Cesium.ShowGeometryInstanceAttribute(true)
@@ -202,6 +205,7 @@ export const useMapStore = defineStore('map', () => {
         const p = pointRes.features.find(
           (item: any) => item.properties['ID'] == curFeatures['properties']['id']
         )
+        // @ts-ignore
         const carter3Position = Cesium.Cartesian3.fromDegrees(...p['geometry']['coordinates'])
         areaPointCenter.push(p['geometry']['coordinates'])
         labelCollection.add({
@@ -225,7 +229,8 @@ export const useMapStore = defineStore('map', () => {
         }),
         asynchronous: false
       })
-      viewer.scene.primitives.add(primitive)
+      const primitives = viewer.scene.primitives.add(primitive)
+      primitivesArray.push(primitives)
       // 添加点击事件
       const scene = viewer.scene
       const handler = new Cesium.ScreenSpaceEventHandler(scene.canvas)
@@ -239,19 +244,21 @@ export const useMapStore = defineStore('map', () => {
           // const attributes = pick.primitive.getGeometryInstanceAttributes(pick.id)
           // attributes.color = Cesium.ColorGeometryInstanceAttribute.toValue(Cesium.Color.WHITE);
 
-          viewer.camera.flyTo({
-            // 从以度为单位的经度和纬度值返回笛卡尔3位置。
-            destination: Cesium.Cartesian3.fromDegrees(...areaPointCenter[id], 40000),
-            orientation: {
-              // heading：默认方向为正北，正角度为向东旋转，即水平旋转，也叫偏航角。
-              // pitch：默认角度为-90，即朝向地面，正角度在平面之上，负角度为平面下，即上下旋转，也叫俯仰角。
-              // roll：默认旋转角度为0，左右旋转，正角度向右，负角度向左，也叫翻滚角
-              heading: Cesium.Math.toRadians(0.0), // 正东，默认北
-              pitch: Cesium.Math.toRadians(-90), // 向正下方看
-              roll: 0.0 // 左右
-            },
-            duration: 2 // 飞行时间（s）
-          })
+          viewer &&
+            viewer.camera.flyTo({
+              // 从以度为单位的经度和纬度值返回笛卡尔3位置。
+              // @ts-ignore
+              destination: Cesium.Cartesian3.fromDegrees(...areaPointCenter[id], 40000),
+              orientation: {
+                // heading：默认方向为正北，正角度为向东旋转，即水平旋转，也叫偏航角。
+                // pitch：默认角度为-90，即朝向地面，正角度在平面之上，负角度为平面下，即上下旋转，也叫俯仰角。
+                // roll：默认旋转角度为0，左右旋转，正角度向右，负角度向左，也叫翻滚角
+                heading: Cesium.Math.toRadians(0.0), // 正东，默认北
+                pitch: Cesium.Math.toRadians(-90), // 向正下方看
+                roll: 0.0 // 左右
+              },
+              duration: 2 // 飞行时间（s）
+            })
         }
       }, Cesium.ScreenSpaceEventType.LEFT_CLICK)
       // 定位到数据区域
@@ -298,6 +305,98 @@ export const useMapStore = defineStore('map', () => {
       viewer.flyTo(line, { duration: 3 })
     }
   }
+  // 路网穿梭(entity渲染)
+  function cerateRoadEntity() {
+    if (viewer) {
+      viewer.camera.setView({
+        // 从以度为单位的经度和纬度值返回笛卡尔3位置。
+        destination: Cesium.Cartesian3.fromDegrees(120.36, 36.09, 40000)
+      })
+      // @ts-ignore
+      const material = new RoadThroughLine(1000, '/images/spriteline.png')
+      // 道路闪烁线
+      Cesium.GeoJsonDataSource.load('/json/qingdaoRoad.geojson').then(function (dataSource) {
+        // @ts-ignore
+        viewer.dataSources.add(dataSource)
+        const entities = dataSource.entities.values
+        // 聚焦
+        // viewer.zoomTo(entities);
+        for (let i = 0; i < entities.length; i++) {
+          let entity: any = entities[i]
+          entity.polyline.width = 1.7
+          entity.polyline.material = material
+        }
+      })
+    }
+  }
+  // 路网穿梭(primitive渲染)
+  async function cerateRoadPrimitive() {
+    if (viewer) {
+      viewer.camera.setView({
+        // 从以度为单位的经度和纬度值返回笛卡尔3位置。
+        destination: Cesium.Cartesian3.fromDegrees(120.36, 36.09, 40000)
+      })
+      const res: any = await getGeojson('/json/qingdaoRoad.geojson')
+      const features = res.features
+      const instance: any = []
+      if (features?.length) {
+        features.forEach((item: any) => {
+          const arr = item.geometry.coordinates
+          arr.forEach((el: any) => {
+            let arr1: any = []
+
+            el.forEach((_el: any) => {
+              arr1 = arr1.concat(_el)
+            })
+            const polyline = new Cesium.PolylineGeometry({
+              positions: Cesium.Cartesian3.fromDegreesArray(arr1),
+              width: 1.7,
+              vertexFormat: Cesium.PolylineMaterialAppearance.VERTEX_FORMAT
+            })
+            const geometry: any = Cesium.PolylineGeometry.createGeometry(polyline)
+            instance.push(
+              new Cesium.GeometryInstance({
+                geometry
+              })
+            )
+          })
+        })
+        let source = `czm_material czm_getMaterial(czm_materialInput materialInput)
+                              {
+                                czm_material material = czm_getDefaultMaterial(materialInput);
+                                vec2 st = materialInput.st;
+                                 vec4 colorImage = texture(image, vec2(fract((st.s - speed * czm_frameNumber * 0.001)), st.t));
+                                 material.alpha = colorImage.a * color.a;
+                                 material.diffuse = colorImage.rgb * 1.5 ;
+                                return material;
+                              }`
+
+        const material = new Cesium.Material({
+          fabric: {
+            uniforms: {
+              color: Cesium.Color.fromCssColorString('#7ffeff'),
+              image: '/images/spriteline.png',
+              speed: 10
+            },
+            source
+          },
+          translucent: function () {
+            return true
+          }
+        })
+        const appearance = new Cesium.PolylineMaterialAppearance()
+        appearance.material = material
+        const primitive = new Cesium.Primitive({
+          geometryInstances: instance,
+          appearance,
+          asynchronous: false
+        })
+
+        const primitives = viewer.scene.primitives.add(primitive)
+        primitivesArray.push(primitives)
+      }
+    }
+  }
   // 关闭弹框
   const handleClose = () => {
     dialogs.value?.windowClose()
@@ -305,20 +404,23 @@ export const useMapStore = defineStore('map', () => {
   // 清空地图 -- 需要优化
   function clearMapAll(initFlag?: boolean) {
     if (viewer) {
-      if (BillboardCollection) {
-        BillboardCollection.removeAll()
-        handleClose()
+      if (viewer && viewer.entities && viewer.entities.values.length) {
+        viewer.entities.values.forEach((item: any) => {
+          viewer && viewer.entities.remove(item)
+        })
       }
       if (cesiumHeatMapObj) {
         cesiumHeatMapObj?.remove()
       }
-      if (viewer.scene.primitives) {
-        viewer.scene.primitives.removeAll()
+      if (viewer.dataSources) {
+        viewer.dataSources.removeAll()
       }
-      if (viewer && viewer.entities && viewer.entities.values.length) {
-        viewer.entities.values.forEach((item: any) => {
-          viewer.entities.remove(item)
+      if (primitivesArray?.length > 1) {
+        primitivesArray.forEach((item: any) => {
+          item && item?.removeAll && item?.removeAll()
         })
+        primitivesArray = []
+        handleClose()
       }
       initFlag && setMapLocatingSignals([113.9332, 22.5212, 28860])
     }
@@ -332,6 +434,8 @@ export const useMapStore = defineStore('map', () => {
     clearMapAll,
     cerateCesiumHeatMap,
     cerateColorLayer,
-    cerateMaskReverseSelect
+    cerateMaskReverseSelect,
+    cerateRoadEntity,
+    cerateRoadPrimitive
   }
 })
