@@ -19,6 +19,7 @@
     "axios": "^1.5.1",
     "cesium": "^1.110.0",
     "cesium-navigation-es6": "^3.0.8",
+    "dayjs": "^1.11.10",
     "echarts": "^5.4.3",
     "element-plus": "^2.3.14",
     "lodash": "^4.17.21",

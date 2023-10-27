@@ -38,26 +38,26 @@ defineExpose({
 </script>
 <style lang="scss">
 .distance-legend {
-  right: 0.28rem;
+  right: 1.4rem;
 }
 </style>
 <style lang="scss" scoped>
 .ShowLngLatContainer {
   position: absolute;
   bottom: 0px;
-  padding: 0.04rem 0.06rem 0.04rem 0.06rem;
+  padding: 0.2rem 0.3rem 0.2rem 0.3rem;
   color: white;
-  font-size: 0.14rem;
+  font-size: 0.7rem;
   right: 0;
   background-color: #00000055;
-  width: 1.75rem;
+  width: 8.75rem;
 
   span {
-    margin-right: 0.06rem;
+    margin-right: 0.3rem;
   }
 
   span:last-child {
-    margin-right: 0.06rem;
+    margin-right: 0.3rem;
   }
 }
 </style>

@@ -26,15 +26,15 @@ dependencies:
   cesium-navigation-es6:
     specifier: ^3.0.8
     version: 3.0.8
+  dayjs:
+    specifier: ^1.11.10
+    version: 1.11.10
   echarts:
     specifier: ^5.4.3
     version: 5.4.3
   element-plus:
     specifier: ^2.3.14
     version: 2.3.14(vue@3.3.4)
-  heatmap.js:
-    specifier: ^2.0.5
-    version: 2.0.5
   lodash:
     specifier: ^4.17.21
     version: 4.17.21
@@ -3227,10 +3227,6 @@ packages:
   /he@1.2.0:
     resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==}
     hasBin: true
-
-  /heatmap.js@2.0.5:
-    resolution: {integrity: sha512-CG2gYFP5Cv9IQCXEg3ZRxnJDyAilhWnQlAuHYGuWVzv6mFtQelS1bR9iN80IyDmFECbFPbg6I0LR5uAFHgCthw==}
-    dev: false
 
   /hosted-git-info@7.0.1:
     resolution: {integrity: sha512-+K84LB1DYwMHoHSgaOY/Jfhw3ucPmSET5v98Ke/HdNSw4a0UktWzyW1mjhjpuxxTqOOsfWT/7iVshHmVZ4IpOA==}

@@ -1,19 +1,29 @@
 // 地图相关
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import Cesium, { Viewer, Cartesian3, Math, Scene } from 'cesium'
+import Cesium, { Viewer, Cartesian3, Math, Color, Scene } from 'cesium'
 import { getGeojson } from '@/api/base'
 import { initCluster } from '@/utils/mapCluster'
 import Dialog from '@/utils/dialog'
 import CesiumHeatMap from '@/utils/cesiumHeatMap'
 import RoadThroughLine from '@/utils/roadThrough'
-
+import Radiant from '@/utils/radiant'
+import CircleDiffusion from '@/utils/diffuse'
+import SkyBoxOnGround from '@/utils/skyBoxOnGround'
+import SkyLineAnalysis from '@/utils/skyLineAnalysis.js'
+import Clock from '@/utils/clock'
+import SnowEffect from '@/utils/snow'
+import RainEffect from '@/utils/rain'
+import FogEffect from '@/utils/fog'
 export const useMapStore = defineStore('map', () => {
   // 要避免 Vue 的响应式劫持，响应式问题可以通过 Vue3 的 shallowRef 或 shallowReactive 来解决
   let viewer: Viewer | null = null
   let cesiumHeatMapObj: any = null
   // primitives 相关图层
   let primitivesArray: any = []
+  // 默认经纬度定位
+  const baseCartesian3 = [120.36, 36.09]
+  const defaultCoordinateCartesian3 = Cesium.Cartesian3.fromDegrees(120.36, 36.09, 40000)
   const dialogs = ref()
   const getViewer = computed(() => viewer)
   function setViewer(myViewer: Viewer | null) {
@@ -310,7 +320,7 @@ export const useMapStore = defineStore('map', () => {
     if (viewer) {
       viewer.camera.setView({
         // 从以度为单位的经度和纬度值返回笛卡尔3位置。
-        destination: Cesium.Cartesian3.fromDegrees(120.36, 36.09, 40000)
+        destination: defaultCoordinateCartesian3
       })
       // @ts-ignore
       const material = new RoadThroughLine(1000, '/images/spriteline.png')
@@ -334,7 +344,7 @@ export const useMapStore = defineStore('map', () => {
     if (viewer) {
       viewer.camera.setView({
         // 从以度为单位的经度和纬度值返回笛卡尔3位置。
-        destination: Cesium.Cartesian3.fromDegrees(120.36, 36.09, 40000)
+        destination: defaultCoordinateCartesian3
       })
       const res: any = await getGeojson('/json/qingdaoRoad.geojson')
       const features = res.features
@@ -397,6 +407,193 @@ export const useMapStore = defineStore('map', () => {
       }
     }
   }
+
+  // 辐射圈
+  let circleWave: any = null
+  function cerateRadiant() {
+    if (viewer) {
+      viewer.camera.setView({
+        // 从以度为单位的经度和纬度值返回笛卡尔3位置。
+        destination: defaultCoordinateCartesian3
+      })
+      // 水波纹扩散
+      circleWave = new Radiant(viewer, 'cirCleWave1')
+      circleWave.add([...baseCartesian3, 10], 'red', 1000, 3000)
+    }
+  }
+  // 圆扩散
+  let circleDiffusion: any = null
+  function cerateDiffuse() {
+    if (viewer) {
+      viewer.camera.setView({
+        // 从以度为单位的经度和纬度值返回笛卡尔3位置。
+        destination: defaultCoordinateCartesian3
+      })
+      // 圆扩散
+      circleDiffusion = new CircleDiffusion(viewer)
+      circleDiffusion.add([...baseCartesian3, 10], '#F7EB08', 2000, 5000)
+    }
+  }
+  // 流动水面
+  function cerateWater() {
+    if (viewer) {
+      viewer.camera.setView({
+        // 从以度为单位的经度和纬度值返回笛卡尔3位置。
+        destination: defaultCoordinateCartesian3
+      })
+      const primitive = new Cesium.Primitive({
+        geometryInstances: new Cesium.GeometryInstance({
+          geometry: new Cesium.RectangleGeometry({
+            rectangle: Cesium.Rectangle.fromDegrees(120.34, 36.06, 120.42, 36.13),
+            vertexFormat: Cesium.EllipsoidSurfaceAppearance.VERTEX_FORMAT
+          })
+        }),
+        appearance: new Cesium.EllipsoidSurfaceAppearance({
+          material: new Cesium.Material({
+            fabric: {
+              type: 'Water',
+              uniforms: {
+                baseWaterColor: new Cesium.Color(64 / 255.0, 157 / 255.0, 253 / 255.0, 0.5),
+                normalMap: '/images/waterNormals.jpg',
+                frequency: 1000.0,
+                animationSpeed: 0.1,
+                amplitude: 10,
+                specularIntensity: 10
+              }
+            }
+          })
+        })
+      })
+      const primitives = viewer.scene.primitives.add(primitive)
+      primitivesArray.push(primitives)
+    }
+  }
+  // 天空盒
+  let groundSkyBox: any = null
+  function cerateSkybox() {
+    if (viewer) {
+      // 教程：https://blog.csdn.net/qq_25519615/article/details/128063735
+      // 内天空盒
+      groundSkyBox = new SkyBoxOnGround({
+        sources: {
+          positiveX: '/images/Standard-Cube-Map/px1.png',
+          negativeX: '/images/Standard-Cube-Map/nx1.png',
+          positiveY: '/images/Standard-Cube-Map/pz.png',
+          negativeY: '/images/Standard-Cube-Map/nz1.png',
+          positiveZ: '/images/Standard-Cube-Map/py.png',
+          negativeZ: '/images/Standard-Cube-Map/ny1.png'
+        }
+      })
+      groundSkyBox.setSkyBox(viewer)
+    }
+  }
+  // 绘制
+  function cerateDraw(type: string) {
+    if (viewer) {
+      if (type === 'draw-point') {
+        // 点
+      } else if (type === 'draw-line') {
+        // 线
+      } else if (type === 'draw-surface') {
+        // 面
+      } else {
+        console.log('绘制类型未开发:', type)
+      }
+    }
+  }
+  // 量测
+  function cerateMeasure(type: string) {
+    if (viewer) {
+      if (type === 'measure-jl') {
+        // 空间距离
+      } else if (type === 'measure-mj') {
+        // 空间面积
+      } else if (type === 'measure-sj') {
+        // 三角量测
+      } else {
+        console.log('测量类型未开发:', type)
+      }
+    }
+  }
+  // 态势图
+  function cerateArrow() {
+    if (viewer) {
+    }
+  }
+  // 水淹模拟
+  function cerateWaterFlood() {
+    if (viewer) {
+    }
+  }
+  // 天际线分析
+  let skyLineIns: any = null
+  async function cerateSkyLine() {
+    if (viewer) {
+      skyLineIns = new SkyLineAnalysis(viewer)
+      viewer.camera.flyTo({
+        // 从以度为单位的经度和纬度值返回笛卡尔3位置。
+        destination: Cesium.Cartesian3.fromDegrees(120.58193064609729, 36.125460378632766, 200),
+        orientation: {
+          // heading：默认方向为正北，正角度为向东旋转，即水平旋转，也叫偏航角。
+          // pitch：默认角度为-90，即朝向地面，正角度在平面之上，负角度为平面下，即上下旋转，也叫俯仰角。
+          // roll：默认旋转角度为0，左右旋转，正角度向右，负角度向左，也叫翻滚角
+          heading: Cesium.Math.toRadians(0.0), // 正东，默认北
+          pitch: Cesium.Math.toRadians(0),
+          roll: 0.0 // 左右
+        },
+        duration: 3 // 飞行时间（s）
+      })
+      setTimeout(() => {
+        skyLineIns.open()
+      })
+    }
+  }
+  // 时间轴
+  function cerateTimeLine() {
+    if (viewer) {
+      new Clock(viewer)
+    }
+  }
+  // 下雪
+  let snow: any = null
+  function cerateSnow() {
+    if (viewer) {
+      snow = new SnowEffect(viewer, {
+        snowSize: 0.02, // 雪花大小
+        snowSpeed: 60.0 // 雪速
+      })
+      snow.show(true)
+    }
+  }
+  // 下雨
+  let instance: any = null
+  function cerateRain() {
+    if (viewer) {
+      instance = new RainEffect(viewer, {
+        tiltAngle: -0.2, //倾斜角度
+        rainSize: 1.0, // 雨大小
+        rainSpeed: 120.0 // 雨速
+      })
+      instance.show(true)
+    }
+  }
+  // 大雾
+  let fog: any = null
+  function cerateFog() {
+    if (viewer) {
+      fog = new FogEffect(viewer, {
+        visibility: 0.2,
+        color: new Color(0.8, 0.8, 0.8, 0.3)
+      })
+      instance.show(true)
+    }
+  }
+  // 火焰
+  function cerateFire() {
+    if (viewer) {
+    }
+  }
+
   // 关闭弹框
   const handleClose = () => {
     dialogs.value?.windowClose()
@@ -415,12 +612,41 @@ export const useMapStore = defineStore('map', () => {
       if (viewer.dataSources) {
         viewer.dataSources.removeAll()
       }
-      if (primitivesArray?.length > 1) {
+      if (primitivesArray?.length > 0) {
         primitivesArray.forEach((item: any) => {
           item && item?.removeAll && item?.removeAll()
         })
+        viewer.scene.primitives.removeAll()
         primitivesArray = []
         handleClose()
+      }
+      if (circleWave) {
+        circleWave.del('cirCleWave1')
+        circleWave = null
+      }
+      if (circleDiffusion) {
+        circleDiffusion.del('circle')
+        circleDiffusion = null
+      }
+      if (groundSkyBox) {
+        groundSkyBox.destroy()
+        groundSkyBox = null
+      }
+      if (skyLineIns) {
+        skyLineIns.close()
+        skyLineIns = null
+      }
+      if (snow) {
+        snow.show(false)
+        snow = null
+      }
+      if (instance) {
+        instance.show(false)
+        instance = null
+      }
+      if (fog) {
+        fog.show(false)
+        fog = null
       }
       initFlag && setMapLocatingSignals([113.9332, 22.5212, 28860])
     }
@@ -436,6 +662,20 @@ export const useMapStore = defineStore('map', () => {
     cerateColorLayer,
     cerateMaskReverseSelect,
     cerateRoadEntity,
-    cerateRoadPrimitive
+    cerateRoadPrimitive,
+    cerateRadiant,
+    cerateDiffuse,
+    cerateWater,
+    cerateSkybox,
+    cerateDraw,
+    cerateMeasure,
+    cerateArrow,
+    cerateWaterFlood,
+    cerateSkyLine,
+    cerateTimeLine,
+    cerateSnow,
+    cerateRain,
+    cerateFog,
+    cerateFire
   }
 })

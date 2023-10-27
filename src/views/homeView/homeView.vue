@@ -16,7 +16,8 @@ const handleClose = (key: string, keyPath: string[]) => {
 }
 
 const menuItemClick = (e: any) => {
-  mapStore.clearMapAll(e.index === 'clearAll')
+  // mapStore.clearMapAll(e.index === 'clearAll')
+  mapStore.clearMapAll(false)
   if (e.index === 'point' || e.index === 'clusterPoint') {
     mapStore.createPoint(e.index)
   } else if (e.index === 'heatMap') {
@@ -29,6 +30,38 @@ const menuItemClick = (e: any) => {
     mapStore.cerateRoadEntity()
   } else if (e.index === 'roadPrimitive') {
     mapStore.cerateRoadPrimitive()
+  } else if (e.index === 'radiant') {
+    mapStore.cerateRadiant()
+  } else if (e.index === 'diffuse') {
+    mapStore.cerateDiffuse()
+  } else if (e.index === 'water') {
+    mapStore.cerateWater()
+  } else if (e.index === 'skybox') {
+    mapStore.cerateSkybox()
+  } else if (e.index === 'draw-point'
+    || e.index === 'draw-line'
+    || e.index === 'draw-surface') {
+    mapStore.cerateDraw(e.index)
+  } else if (e.index === 'measure-jl'
+    || e.index === 'measure-mj'
+    || e.index === 'measure-sj') {
+    mapStore.cerateMeasure(e.index)
+  } else if (e.index === 'arrow') {
+    mapStore.cerateArrow()
+  } else if (e.index === 'waterFlood') {
+    mapStore.cerateWaterFlood()
+  } else if (e.index === 'skyLine') {
+    mapStore.cerateSkyLine()
+  } else if (e.index === 'timeLine') {
+    mapStore.cerateTimeLine()
+  } else if (e.index === 'snow') {
+    mapStore.cerateSnow()
+  } else if (e.index === 'rain') {
+    mapStore.cerateRain()
+  } else if (e.index === 'fog') {
+    mapStore.cerateFog()
+  } else if (e.index === 'fire') {
+    mapStore.cerateFire()
   } else {
     console.log('当前选中项未匹配到:' + e.index);
   }
@@ -69,7 +102,99 @@ const menuItemList = ref([
         title: '路网穿梭(primitive渲染)',
       },
       {
+        id: 'radiant',
+        title: '辐射圈',
+      },
+      {
+        id: 'diffuse',
+        title: '圆扩散',
+      },
+      {
+        id: 'water',
+        title: '流动水面',
+      },
+      {
+        id: 'skybox',
+        title: '天空盒',
+      },
+      {
+        id: 'skyLine',
+        title: '天际线分析',
+      },
+      {
+        id: 'timeLine',
+        title: '时间轴(白/夜分界线)',
+      },
+      {
         id: 'clearAll',
+        title: '清空地图',
+      },
+    ]
+  },
+  {
+    id: 'particle',
+    title: '粒子效果',
+    children: [
+      {
+        id: 'snow',
+        title: '下雪',
+      },
+      {
+        id: 'rain',
+        title: '下雨',
+      },
+      {
+        id: 'fog',
+        title: '大雾',
+      },
+      {
+        id: 'fire',
+        title: '火焰',
+      },
+      {
+        id: 'clearAll2',
+        title: '清空地图',
+      },
+    ]
+  },
+  {
+    id: 'geometry',
+    title: '几何相关',
+    children: [
+      {
+        id: 'draw-point',
+        title: '绘制点',
+      },
+      {
+        id: 'draw-line',
+        title: '绘制线',
+      },
+      {
+        id: 'draw-surface',
+        title: '绘制面',
+      },
+      {
+        id: 'measure-jl',
+        title: '空间距离',
+      },
+      {
+        id: 'measure-mj',
+        title: '空间面积',
+      },
+      {
+        id: 'measure-sj',
+        title: '三角量测',
+      },
+      {
+        id: 'arrow',
+        title: '态势图',
+      },
+      {
+        id: 'waterFlood',
+        title: '水淹模拟',
+      },
+      {
+        id: 'clearAll3',
         title: '清空地图',
       },
     ]
@@ -99,14 +224,15 @@ const mapConfig: Viewer.ConstructorOptions = {
 
 <template>
   <div class="common-layout">
-    <div class="layout-menu" :style="!isCollapse ? 'left: 0;' : 'left: -2rem;'">
+    <div class="layout-menu" :style="!isCollapse ? 'left: 0;' : 'left: -10rem;'">
       <div class="menu-btn" @click="isCollapse = !isCollapse">
         <img src="/images/right.png" v-if="isCollapse" alt="展开">
         <img src="/images/left.png" v-else alt="收缩">
       </div>
-      <el-menu :default-openeds="defaultOpeneds" background-color="#001428" text-color="#c0c4cc" active-text-color="#fff"
-        class="el-menu-vertical-demo" :collapse="isCollapse" @open="handleOpen" @close="handleClose" popper-effect="dark">
-        <el-scrollbar height="80%">
+      <el-menu unique-opened :default-openeds="defaultOpeneds" background-color="#001428" text-color="#c0c4cc"
+        active-text-color="#4D9EFC" class="el-menu-vertical-demo" :collapse="isCollapse" @open="handleOpen"
+        @close="handleClose" popper-effect="dark">
+        <el-scrollbar max-height="43rem">
           <el-sub-menu :index="item.id" v-for="item in menuItemList" :key="item.id">
             <template #title>
               <span>{{ item.title }}</span>
@@ -129,32 +255,35 @@ const mapConfig: Viewer.ConstructorOptions = {
   width: 100%;
   height: 100%;
 
+  .el-menu {
+    border-right: solid 1px transparent;
+  }
+
   .layout-menu {
     position: absolute;
     top: 5%;
     left: 0;
     z-index: 9;
-    width: 2rem;
+    width: 10rem;
     height: 80%;
     // background-color: rgba(000, 000, 000, .5);
-    border-radius: 0.1rem;
+    border-radius: 0.5rem;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
     transition: all .3s;
 
     .menu-btn {
       position: absolute;
-      right: -0.35rem;
+      right: -1.5rem;
       top: 1%;
       // transform: translateY(-50%);
       cursor: pointer;
       transition: all .3s;
 
       img {
-        width: 0.35rem;
-        height: 0.5rem;
+        width: 1.5rem;
+        height: 2rem;
       }
     }
   }
-}
-</style>
+}</style>
