@@ -3,6 +3,9 @@ import MyMap from '@/components/MyMap.vue';
 import { Viewer } from 'cesium'
 import { ref } from 'vue'
 import { useMapStore } from '@/stores/map'
+import { useRouter } from "vue-router"
+
+const router = useRouter()
 
 // 实例化store
 const mapStore = useMapStore()
@@ -60,6 +63,10 @@ const menuItemClick = (e: any) => {
     mapStore.cerateFog()
   } else if (e.index === 'fire') {
     mapStore.cerateFire()
+  } else if (e.index === 'Vue3Cesium') {
+    router.push(e.index)
+  } else if (e.index === 'cesiumDevKit') {
+    router.push(e.index)
   } else {
     if (e.index != 'clearAll') {
       console.log('当前选中项未匹配到:' + e.index);
@@ -203,13 +210,11 @@ const menuItemList = ref([
   },
   {
     id: 'Vue3Cesium',
-    title: 'CesiumVue3组件库',
-    children: []
+    title: 'CesiumVue3组件库', // https://zouyaoji.top/vue-cesium/#/zh-CN
   },
   {
-    id: 'cesium_dev_kit',
-    title: 'CesiumKit组件库',
-    children: []
+    id: 'cesiumDevKit',
+    title: 'CesiumDevKit组件库', // https://github.com/dengxiaoning/cesium_dev_kit
   },
 ])
 
@@ -246,7 +251,7 @@ const mapConfig: Viewer.ConstructorOptions = {
         @close="handleClose" popper-effect="dark">
         <el-scrollbar max-height="43rem">
           <template v-for="item in menuItemList" :key="item.id">
-            <el-sub-menu :index="item.id">
+            <el-sub-menu :index="item.id" v-if="item?.children?.length">
               <template #title>
                 <span>{{ item.title }}</span>
               </template>
@@ -263,6 +268,7 @@ const mapConfig: Viewer.ConstructorOptions = {
                 </template>
               </template>
             </el-sub-menu>
+            <el-menu-item v-else @click="menuItemClick" :index="item.id">{{ item.title }}</el-menu-item>
           </template>
         </el-scrollbar>
       </el-menu>
