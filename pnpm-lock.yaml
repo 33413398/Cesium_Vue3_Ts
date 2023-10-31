@@ -65,6 +65,9 @@ dependencies:
   vue:
     specifier: ^3.3.4
     version: 3.3.4
+  vue-cesium:
+    specifier: ^3.2.2
+    version: 3.2.2(@types/lodash-es@4.17.9)(vue@3.3.4)
   vue-router:
     specifier: ^4.2.4
     version: 4.2.4(vue@3.3.4)
@@ -128,6 +131,10 @@ packages:
     resolution: {integrity: sha512-1Yjs2SvM8TflER/OD3cOjhWWOZb58A2t7wpE2S9XfBYTiIl+XFhQG2bjy4Pu1I+EAlCNUzRDYDdFwFYUKvXcIA==}
     engines: {node: '>=0.10.0'}
     dev: true
+
+  /@amap/amap-jsapi-loader@1.0.1:
+    resolution: {integrity: sha512-nPyLKt7Ow/ThHLkSvn2etQlUzqxmTVgK7bIgwdBRTg2HK5668oN7xVxkaiRe3YZEzGzfV2XgH5Jmu2T73ljejw==}
+    dev: false
 
   /@antfu/utils@0.7.6:
     resolution: {integrity: sha512-pvFiLP2BeOKA/ZOS6jxx4XhKzdVLHDhGlFEaZ2flWWYf2xOqVniqpk38I04DFRyz+L0ASggl7SkItTc+ZLju4w==}
@@ -2149,6 +2156,10 @@ packages:
     resolution: {integrity: sha512-I9HBO3BHIxEMQmltmHM3iqUW6IHqi3gsL9wTSXvHTRpOrA6q2OxtR58EDSaOGjHhDVJ+wIOAxZyKq2x00AVmqw==}
     dev: false
 
+  /@zouyaoji/heatmap.js@2.0.8:
+    resolution: {integrity: sha512-kBQny/zOUFH2OFoVyu6IdGJEcQMENIAASUsaZhk+OuJ9WexsYf6EU2lCyGURcsFly1kTMZKODlV7nBTCgfvJqg==}
+    dev: false
+
   /acorn-import-assertions@1.9.0(acorn@8.10.0):
     resolution: {integrity: sha512-cmMwop9x+8KFhxvKrKfPYmN6/pKTYYHBqLa0DfvVZcKMJWNyWLnaqND7dx/qn66R7ewM1UX5XMaDVP5wlVTaVA==}
     peerDependencies:
@@ -2434,6 +2445,10 @@ packages:
   /commander@8.3.0:
     resolution: {integrity: sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww==}
     engines: {node: '>= 12'}
+    dev: false
+
+  /compare-versions@5.0.3:
+    resolution: {integrity: sha512-4UZlZP8Z99MGEY+Ovg/uJxJuvoXuN4M6B3hKaiackiHrgzQFEe3diJi1mf1PNHbFujM7FvLrK2bpgIaImbtZ1A==}
     dev: false
 
   /concat-map@0.0.1:
@@ -3457,6 +3472,10 @@ packages:
     optionalDependencies:
       graceful-fs: 4.2.11
 
+  /kdbush@3.0.0:
+    resolution: {integrity: sha512-hRkd6/XW4HTsA9vjVpY9tuXJYLSlelnkTmVFu4M9/7MIYQtFcHpbugAU7UbOfjOiVSVYl2fqgBuJ32JUmRo5Ew==}
+    dev: false
+
   /kdbush@4.0.2:
     resolution: {integrity: sha512-WbCVYJ27Sz8zi9Q7Q0xHC+05iwkm3Znipc2XTlrnJbsHMYktW4hPhXUE8Ys1engBrvffoSCqbil1JQAa7clRpA==}
     dev: false
@@ -3586,6 +3605,10 @@ packages:
     resolution: {integrity: sha512-58qz5Qc/6Geu8Ib3bBWERE5R7pM5ErrJVo16fAtu6ryxVaE3VAtM/u2vurDxaq8AGZ3yWxuM/DnylTga5a4XCQ==}
     dev: false
 
+  /mgrs@1.0.0:
+    resolution: {integrity: sha512-awNbTOqCxK1DBGjalK3xqWIstBZgN6fxsMSiXLs9/spqWkF2pAhb2rrYCFSsr1/tT7PhcDGjZndG8SWYn0byYA==}
+    dev: false
+
   /micromatch@4.0.5:
     resolution: {integrity: sha512-DMy+ERcEW2q8Z2Po+WNXuw3c5YaUSFjAO5GsJqfEl7UjvtIuFKO6ZrKvcItdy98dwFI2N1tg3zNIdKaQT+aNdA==}
     engines: {node: '>=8.6'}
@@ -3633,6 +3656,10 @@ packages:
     dependencies:
       brace-expansion: 2.0.1
     dev: true
+
+  /mitt@3.0.1:
+    resolution: {integrity: sha512-vKivATfr97l2/QBCYAkXYDbrIWPM2IIKEl7YPhjCvKlG3kE2gm+uBo6nEXK3M5/Ffh/FLpKExzOQ3JJoJGFKBw==}
+    dev: false
 
   /mlly@1.4.2:
     resolution: {integrity: sha512-i/Ykufi2t1EZ6NaPLdfnZk2AX8cs0d+mTzVKuPfqPKPatxLApaBoxJQ9x1/uckXtrS/U5oisPMDkNs0yQTaBRg==}
@@ -3969,6 +3996,13 @@ packages:
     engines: {node: '>=14'}
     hasBin: true
     dev: true
+
+  /proj4@2.9.2:
+    resolution: {integrity: sha512-bdyfNmtlWjQN/rHEHEiqFvpTUHhuzDaeQ6Uu1G4sPGqk+Xkxae6ahh865fClJokSGPBmlDOQWWaO6465TCfv5Q==}
+    dependencies:
+      mgrs: 1.0.0
+      wkt-parser: 1.3.3
+    dev: false
 
   /protobufjs@7.2.5:
     resolution: {integrity: sha512-gGXRSXvxQ7UiPgfw8gevrfRWcTlSbOFg+p/N+JVJEK5VhueL2miT6qTymqAmjr1Q5WbOCyJbyrk6JfWKwlFn6A==}
@@ -4665,6 +4699,29 @@ packages:
     optionalDependencies:
       fsevents: 2.3.3
 
+  /vue-cesium@3.2.2(@types/lodash-es@4.17.9)(vue@3.3.4):
+    resolution: {integrity: sha512-kgf7teBnxIR2jAYiIap9GRnKUzIKqBAceJ06gpPG2zYjzxsVUEY8XEj3eDc8yF0CdzQ9L8gpmQuNHYIox+5HAw==}
+    peerDependencies:
+      vue: ^3.2.47
+    dependencies:
+      '@amap/amap-jsapi-loader': 1.0.1
+      '@turf/circle': 6.5.0
+      '@vue/shared': 3.3.4
+      '@zouyaoji/heatmap.js': 2.0.8
+      compare-versions: 5.0.3
+      echarts: 5.4.3
+      kdbush: 3.0.0
+      lodash: 4.17.21
+      lodash-es: 4.17.21
+      lodash-unified: 1.0.3(@types/lodash-es@4.17.9)(lodash-es@4.17.21)(lodash@4.17.21)
+      mitt: 3.0.1
+      proj4: 2.9.2
+      urijs: 1.19.11
+      vue: 3.3.4
+    transitivePeerDependencies:
+      - '@types/lodash-es'
+    dev: false
+
   /vue-demi@0.14.6(vue@3.3.4):
     resolution: {integrity: sha512-8QA7wrYSHKaYgUxDA5ZC24w+eHm3sYCbp0EzcDwKqN3p6HqtTCGR/GVsPyZW92unff4UlcSh++lmqDWN3ZIq4w==}
     engines: {node: '>=12'}
@@ -4798,6 +4855,10 @@ packages:
     dependencies:
       isexe: 2.0.0
     dev: true
+
+  /wkt-parser@1.3.3:
+    resolution: {integrity: sha512-ZnV3yH8/k58ZPACOXeiHaMuXIiaTk1t0hSUVisbO0t4RjA5wPpUytcxeyiN2h+LZRrmuHIh/1UlrR9e7DHDvTw==}
+    dev: false
 
   /wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}

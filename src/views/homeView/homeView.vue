@@ -46,8 +46,6 @@ const menuItemClick = (e: any) => {
     || e.index === 'measure-mj'
     || e.index === 'measure-sj') {
     mapStore.cerateMeasure(e.index)
-  } else if (e.index === 'arrow') {
-    mapStore.cerateArrow()
   } else if (e.index === 'waterFlood') {
     mapStore.cerateWaterFlood()
   } else if (e.index === 'skyLine') {
@@ -63,7 +61,9 @@ const menuItemClick = (e: any) => {
   } else if (e.index === 'fire') {
     mapStore.cerateFire()
   } else {
-    console.log('当前选中项未匹配到:' + e.index);
+    if (e.index != 'clearAll') {
+      console.log('当前选中项未匹配到:' + e.index);
+    }
   }
 
 }
@@ -110,20 +110,90 @@ const menuItemList = ref([
         title: '圆扩散',
       },
       {
-        id: 'water',
-        title: '流动水面',
+        id: 'scene',
+        title: '场景相关',
+        children: [
+          {
+            id: 'water',
+            title: '流动水面',
+          },
+          {
+            id: 'skybox',
+            title: '天空盒',
+          },
+          {
+            id: 'skyLine',
+            title: '天际线分析',
+          },
+          {
+            id: 'timeLine',
+            title: '时间轴(白/夜分界线)',
+          },
+        ]
       },
       {
-        id: 'skybox',
-        title: '天空盒',
+        id: 'particle',
+        title: '粒子效果',
+        children: [
+          {
+            id: 'snow',
+            title: '下雪',
+          },
+          {
+            id: 'rain',
+            title: '下雨',
+          },
+          {
+            id: 'fog',
+            title: '大雾',
+          },
+          {
+            id: 'fire',
+            title: '火焰',
+          },
+          {
+            id: 'clearAll2',
+            title: '清空地图',
+          },
+        ]
       },
       {
-        id: 'skyLine',
-        title: '天际线分析',
-      },
-      {
-        id: 'timeLine',
-        title: '时间轴(白/夜分界线)',
+        id: 'geometry',
+        title: '几何相关',
+        children: [
+          {
+            id: 'draw-point',
+            title: '绘制点',
+          },
+          {
+            id: 'draw-line',
+            title: '绘制线',
+          },
+          {
+            id: 'draw-surface',
+            title: '绘制面',
+          },
+          {
+            id: 'measure-jl',
+            title: '空间距离',
+          },
+          {
+            id: 'measure-mj',
+            title: '空间面积',
+          },
+          {
+            id: 'measure-sj',
+            title: '三角量测',
+          },
+          // {
+          //   id: 'waterFlood',
+          //   title: '水淹模拟',
+          // },
+          {
+            id: 'clearAll3',
+            title: '清空地图',
+          },
+        ]
       },
       {
         id: 'clearAll',
@@ -132,72 +202,14 @@ const menuItemList = ref([
     ]
   },
   {
-    id: 'particle',
-    title: '粒子效果',
-    children: [
-      {
-        id: 'snow',
-        title: '下雪',
-      },
-      {
-        id: 'rain',
-        title: '下雨',
-      },
-      {
-        id: 'fog',
-        title: '大雾',
-      },
-      {
-        id: 'fire',
-        title: '火焰',
-      },
-      {
-        id: 'clearAll2',
-        title: '清空地图',
-      },
-    ]
+    id: 'Vue3Cesium',
+    title: 'CesiumVue3组件库',
+    children: []
   },
   {
-    id: 'geometry',
-    title: '几何相关',
-    children: [
-      {
-        id: 'draw-point',
-        title: '绘制点',
-      },
-      {
-        id: 'draw-line',
-        title: '绘制线',
-      },
-      {
-        id: 'draw-surface',
-        title: '绘制面',
-      },
-      {
-        id: 'measure-jl',
-        title: '空间距离',
-      },
-      {
-        id: 'measure-mj',
-        title: '空间面积',
-      },
-      {
-        id: 'measure-sj',
-        title: '三角量测',
-      },
-      {
-        id: 'arrow',
-        title: '态势图',
-      },
-      {
-        id: 'waterFlood',
-        title: '水淹模拟',
-      },
-      {
-        id: 'clearAll3',
-        title: '清空地图',
-      },
-    ]
+    id: 'cesium_dev_kit',
+    title: 'CesiumKit组件库',
+    children: []
   },
 ])
 
@@ -233,16 +245,25 @@ const mapConfig: Viewer.ConstructorOptions = {
         active-text-color="#4D9EFC" class="el-menu-vertical-demo" :collapse="isCollapse" @open="handleOpen"
         @close="handleClose" popper-effect="dark">
         <el-scrollbar max-height="43rem">
-          <el-sub-menu :index="item.id" v-for="item in menuItemList" :key="item.id">
-            <template #title>
-              <span>{{ item.title }}</span>
-            </template>
-            <template v-if="item.children?.length">
-              <el-menu-item @click="menuItemClick" :index="citem.id" v-for="citem in item.children" :key="citem.id">{{
-                citem.title
-              }}</el-menu-item>
-            </template>
-          </el-sub-menu>
+          <template v-for="item in menuItemList" :key="item.id">
+            <el-sub-menu :index="item.id">
+              <template #title>
+                <span>{{ item.title }}</span>
+              </template>
+              <template v-for="citem in item.children" :key="citem.id">
+                <template v-if="citem?.children?.length">
+                  <el-sub-menu :index="citem.id">
+                    <template #title><span>{{ citem.title }}</span></template>
+                    <el-menu-item @click="menuItemClick" :index="ccitem.id" v-for="ccitem in citem.children"
+                      :key="ccitem.id">{{ ccitem.title }}</el-menu-item>
+                  </el-sub-menu>
+                </template>
+                <template v-else>
+                  <el-menu-item @click="menuItemClick" :index="citem.id">{{ citem.title }}</el-menu-item>
+                </template>
+              </template>
+            </el-sub-menu>
+          </template>
         </el-scrollbar>
       </el-menu>
     </div>
@@ -286,4 +307,5 @@ const mapConfig: Viewer.ConstructorOptions = {
       }
     }
   }
-}</style>
+}
+</style>
