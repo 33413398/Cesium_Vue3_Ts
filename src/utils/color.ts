@@ -1,10 +1,5 @@
 /*
  * @Description: 颜色值处理通用函数
- * @Version: 1.668
- * @Autor: Hawk
- * @Date: 2021-06-23 15:52:13
- * @LastEditors: Hawk
- * @LastEditTime: 2021-08-20 16:01:50
  */
 // 输入16进制颜色值 转 rgb 的数组值 255
 export function colorRgb(inColor: string): Array<number> {
