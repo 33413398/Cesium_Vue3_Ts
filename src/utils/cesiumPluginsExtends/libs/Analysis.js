@@ -1,4 +1,4 @@
-import echarts from 'echarts'
+import * as echarts from 'echarts';
 import { Math3d } from './Math3d'
 import { Graphics } from './Graphics'
 let Cesium = null;

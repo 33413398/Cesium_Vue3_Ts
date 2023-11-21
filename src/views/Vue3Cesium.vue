@@ -20,6 +20,39 @@ onMounted(() => {
   // })
 })
 
+// 热力图
+const heatmap = ref()
+const heatmapFlag = ref(false)
+const heatmapData = ref()
+const heatmapRectangle = ref()
+const heatmapMin = ref()
+const heatmapMax = ref()
+const segments = [
+  [10, '#4A90C3'],
+  [20, '#81AAAC'],
+  [40, '#B2C899'],
+  [60, '#E5EA84'],
+  [100, '#F8DE6D'],
+  [150, '#EFA451'],
+  [200, '#E46C38'],
+  [346, '#D53127']
+]
+// @ts-ignore
+function onHeatmapReady({ Cesium, viewer, cesiumObject }) {
+  // @ts-ignore
+  heatmap.value.childRef.value.creatingPromise.then(({ Cesium, viewer, cesiumObject }) => {
+    console.log(cesiumObject)
+    if (cesiumObject instanceof Cesium.GroundPrimitive) {
+      const geometry = cesiumObject.geometryInstances.geometry.constructor.createGeometry(cesiumObject.geometryInstances.geometry)
+      viewer.scene.camera.flyToBoundingSphere(geometry.boundingSphere)
+    } else if (cesiumObject instanceof Cesium.Entity) {
+      viewer.flyTo(cesiumObject)
+    } else {
+      viewer.camera.flyTo({ destination: cesiumObject.imageryProvider.rectangle })
+    }
+  })
+}
+
 // ready 事件回调函数的参数可以解构成 Cesium 和 viewer 两个变量
 const onViewerReady = (readyObj: any) => {
   // console.log(readyObj.Cesium) // Cesium namespace object
@@ -75,6 +108,7 @@ const currentMenu = ref('')
 const menuItemClick = (e: any) => {
   currentMenu.value = e.index
   if (viewer.value) {
+    heatmapFlag.value = false
     if (e.index === 'base') {
       router.push('/')
     } else if (e.index === 'cesiumDevKit') {
@@ -89,6 +123,15 @@ const menuItemClick = (e: any) => {
           roll: 0.002443376981836387
         }
       })
+    } else if (e.index === 'heatmap') {
+      // @ts-ignore
+      myCesium.Resource.fetchJson({ url: 'https://zouyaoji.top/vue-cesium/SampleData/heatmap/pop.json' }).then(res => {
+        heatmapRectangle.value = res.bounds
+        heatmapMin.value = res.min
+        heatmapMax.value = res.max
+        heatmapData.value = res.data
+      })
+      heatmapFlag.value = true
     } else {
 
     }
@@ -110,19 +153,15 @@ const menuItemList = ref<any>([
         title: '淹没分析',
       },
       {
-        id: 'VcOverlayWindmap',
-        title: '风场图',
-      },
-      {
-        id: 'VcOverlayTyphoon',
-        title: '台风',
+        id: 'heatmap',
+        title: '热力图',
       },
     ]
   },
-  {
-    id: 'cesiumDevKit',
-    title: 'CesiumDevKit组件库', // https://github.com/dengxiaoning/cesium_dev_kit
-  },
+  // {
+  //   id: 'cesiumDevKit',
+  //   title: 'CesiumDevKit组件库', // https://github.com/dengxiaoning/cesium_dev_kit
+  // },
 ])
 
 const defaultOpeneds = ref([1])
@@ -182,6 +221,8 @@ function onStoped(e: any) {
   starting.value = false
   console.log(e)
 }
+
+
 </script>
 
 <template>
@@ -237,13 +278,22 @@ function onStoped(e: any) {
       </vc-layer-imagery>
       <!-- 淹没模拟 -->
       <vc-analysis-flood ref="flood" :min-height="minHeight" :max-height="maxHeight" :speed="speed"
-        :polygon-hierarchy="polygonHierarchy" @stop="onStoped" color="rgba(205,171,59,0.6)">
+        :polygon-hierarchy="polygonHierarchy" @stop="onStoped">
       </vc-analysis-flood>
       <template v-if="currentMenu === 'VcAnalysisFlood'">
         <vc-layer-imagery :sortOrder="1">
           <vc-imagery-provider-tianditu map-style="img_c" :token="tdtKey"></vc-imagery-provider-tianditu>
         </vc-layer-imagery>
         <vc-terrain-provider-cesium></vc-terrain-provider-cesium>
+      </template>
+      <!-- 热力图 -->
+      <vc-overlay-heatmap v-if="heatmapData?.length" ref="heatmap" :data="heatmapData" :rectangle="heatmapRectangle"
+        :max="heatmapMax" :min="heatmapMin" :show="heatmapFlag" :options="options" @ready="onHeatmapReady"
+        type="primitive" :segments="segments">
+      </vc-overlay-heatmap>
+      <template v-if="currentMenu === 'heatmap'">
+        <vc-datasource-geojson data="https://zouyaoji.top/vue-cesium/SampleData/geojson/wuhou.json"
+          stroke="red"></vc-datasource-geojson>
       </template>
     </vc-viewer>
     <ShowLngLat ref="ShowLngLatRef" />
@@ -256,6 +306,13 @@ function onStoped(e: any) {
         <el-button type="danger" round @click="start">开始</el-button>
         <el-button :disabled="!starting" type="danger" round @click="pause">{{ pausing ? '继续' : '暂停' }}</el-button>
         <el-button type="danger" round @click="stop">结束</el-button>
+      </el-row>
+    </template>
+    <template v-if="currentMenu === 'heatmap'">
+      <el-row class="demo-toolbar">
+        <el-button type="danger" round @click="heatmap.unload()">销毁</el-button>
+        <el-button type="danger" round @click="heatmap.load()">加载</el-button>
+        <el-button type="danger" round @click="heatmap.reload()">重载</el-button>
       </el-row>
     </template>
   </div>

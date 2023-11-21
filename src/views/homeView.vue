@@ -212,10 +212,10 @@ const menuItemList = ref([
     id: 'Vue3Cesium',
     title: 'CesiumVue3组件库', // https://zouyaoji.top/vue-cesium/#/zh-CN
   },
-  {
-    id: 'cesiumDevKit',
-    title: 'CesiumDevKit组件库', // https://github.com/dengxiaoning/cesium_dev_kit
-  },
+  // {
+  //   id: 'cesiumDevKit',
+  //   title: 'CesiumDevKit组件库', // https://github.com/dengxiaoning/cesium_dev_kit
+  // },
 ])
 
 const defaultOpeneds = ref([1])
